@@ -147,6 +147,15 @@ html.light .text-gradient-emerald { background: linear-gradient(135deg, oklch(0.
 @layer base {
   * { border-color: var(--color-border); }
 
+  html { -webkit-text-size-adjust: 100%; }
+
+  /* Task 1 — fast, smooth theme-switch transition on every element */
+  *, *::before, *::after {
+    transition-property: color, background-color, border-color, fill, stroke;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
   html { direction: rtl; }
 
   body {
@@ -284,26 +293,43 @@ html.light .text-gradient-emerald { background: linear-gradient(135deg, oklch(0.
   /* Hide categories nav while the AI summary/chat dialog is open */
   body.ai-dialog-open .hide-when-ai-open { display: none !important; }
 
-  /* Hide the entire site header while AI search dialog is open */
-  body.ai-search-open header.site-header { display: none !important; }
-
-  /* Site header — transparent with a beautiful blur; only the buttons/logo stay visible (like the reference). */
+  /* Task 5 — smooth full-screen takeover: slide header out instead of abrupt display:none */
   header.site-header {
+    /* Task 6 — glassmorphism: semi-transparent frosted background + subtle border */
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    background: transparent !important;
-    border-bottom: none !important;
-    box-shadow: none !important;
+    background: oklch(0.14 0.03 246 / 0.62) !important;
+    border-bottom: 1px solid oklch(1 0 0 / 0.10) !important;
+    box-shadow: 0 1px 24px -10px oklch(0 0 0 / 0.35) !important;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity  0.35s ease !important;
   }
   html.light header.site-header {
-    background: transparent !important;
+    background: oklch(0.985 0.005 240 / 0.75) !important;
+    border-bottom: 1px solid oklch(0.18 0.03 246 / 0.12) !important;
   }
+  body.ai-search-open header.site-header {
+    transform: translateY(-100%);
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  /* Slide-from-top animation used by AI summary panel */
+  @keyframes slide-from-top {
+    0%   { transform: translateY(-24px); opacity: 0; }
+    100% { transform: translateY(0);     opacity: 1; }
+  }
+  .animate-slide-from-top { animation: slide-from-top 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
   /* Honor reduced-motion preferences */
   @media (prefers-reduced-motion: reduce) {
-    .animate-pop-in, .theme-burst, .lang-sweep, .confetti-ring {
+    .animate-pop-in, .theme-burst, .lang-sweep, .confetti-ring, .animate-slide-from-top {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
+    }
+    /* Also disable the Task 1 color transitions */
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
     }
   }
 

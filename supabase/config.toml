@@ -1,5 +1,8 @@
 project_id = "zwindietzovcleiatfbr"
 
+[auth.email]
+enable_confirmations = false
+
 [functions.evolution-critic]
 verify_jwt = false
 

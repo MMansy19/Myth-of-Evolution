@@ -96,9 +96,9 @@ function PostAIDialog({ post, onClose }: { post: { id: string; title: string; co
   };
 
   return (
-    <div className="fixed inset-0 grid place-items-center p-3 bg-black/70 backdrop-blur-2xl animate-pop-in"
+    <div className="fixed inset-0 flex items-start justify-center pt-4 sm:pt-6 p-3 bg-black/60 backdrop-blur-2xl animate-slide-from-top"
          style={{ zIndex: 2147483600 }} onClick={onClose}>
-      <div className="w-full max-w-2xl rounded-3xl flex flex-col max-h-[90vh] overflow-hidden border border-white/15 glass-strong"
+      <div className="w-full max-w-2xl rounded-3xl flex flex-col max-h-[92vh] overflow-hidden border border-white/15 glass-strong"
         style={{ boxShadow: "0 30px 80px -20px rgba(0,0,0,0.6)" }}
         onClick={(e) => e.stopPropagation()}>
         <header className="flex items-center justify-between gap-2 p-4 border-b border-white/10 min-w-0">

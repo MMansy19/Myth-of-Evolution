@@ -175,7 +175,7 @@ function PostPage() {
           </div>
           {eCover && <img src={eCover} alt="غلاف" className="w-full max-h-72 object-cover rounded-2xl"/>}
           <RichEditor value={eContent} onChange={setEContent} placeholder="عدّل المحتوى…"/>
-          <div className="flex gap-2">
+          <div className="sticky bottom-4 z-30 flex gap-2 glass rounded-2xl p-2 shadow-xl">
             <button onClick={save} disabled={busy}
               className="flex-1 rounded-xl py-2.5 font-bold text-sm bg-primary text-primary-foreground inline-flex items-center justify-center gap-1.5 disabled:opacity-50">
               <Save className="h-4 w-4"/> {busy ? "جارٍ الحفظ…" : "حفظ التغييرات"}
@@ -188,7 +188,7 @@ function PostPage() {
         </div>
       ) : (
         <>
-          <h1 className="text-3xl font-black text-gradient-emerald">{p.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-gradient-emerald">{p.title}</h1>
           <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
             <span>{p.author_name ?? "—"}</span>
             <span>·</span>

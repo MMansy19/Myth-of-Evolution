@@ -1,7 +1,7 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
-import { LogIn, LogOut, Home, Sparkles, Dna, Leaf, Microscope, Shield, Sun, Moon, Globe, Check, X, LayoutGrid } from "lucide-react";
-import { useEffect, useState } from "react";
+import { LogIn, LogOut, Home, Sparkles, Dna, Leaf, Microscope, Shield, Sun, Moon, Globe, Check, LayoutGrid } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import logo from "@/assets/logo.png";
 
 const NAV = [
@@ -87,50 +87,62 @@ export default function Layout() {
   );
 }
 
-/** Button that pops a stunning ring of section links instead of consuming screen space. */
+/** Button that opens an inline dropdown panel below the sticky header. */
 function SectionsButton({ current }: { current: string }) {
   const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (!btnRef.current?.contains(t) && !panelRef.current?.contains(t)) setOpen(false);
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onDown);
+    };
   }, [open]);
 
   return (
     <>
-      <button onClick={() => setOpen(true)} title="الأقسام" aria-label="الأقسام"
-        className="liquid-glass inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-bold">
+      <button ref={btnRef} onClick={() => setOpen(v => !v)} title="الأقسام" aria-label="الأقسام"
+        className={`liquid-glass inline-flex items-center gap-1.5 h-8 sm:h-9 px-2.5 sm:px-3 rounded-full text-xs font-bold transition ${
+          open ? "ring-2 ring-primary/40 bg-primary/10" : ""
+        }`}>
         <LayoutGrid className="h-3.5 w-3.5"/>
         <span className="hidden sm:inline">الأقسام</span>
       </button>
       {open && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xl animate-pop-in"
-             onClick={() => setOpen(false)}>
-          <div onClick={e => e.stopPropagation()}
-            className="w-full max-w-md glass-strong rounded-3xl p-4 shadow-2xl border border-white/10">
-            <div className="flex items-center justify-between px-2 py-2 border-b border-white/10 mb-3">
-              <div className="flex items-center gap-2 text-xs font-bold"><LayoutGrid className="h-4 w-4"/> تصفّح الأقسام</div>
-              <button onClick={() => setOpen(false)} className="p-1 rounded-md hover:bg-white/10"><X className="h-3.5 w-3.5"/></button>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {NAV.map((item) => {
-                const Icon = item.icon;
-                const active = current === item.to;
-                return (
-                  <Link key={item.to} to={item.to} onClick={() => setOpen(false)}
-                    style={{
-                      borderColor: active ? item.color : undefined,
-                    }}
-                    className={`flex items-center gap-2 p-3 rounded-2xl text-right transition border border-transparent ${active ? "bg-white/10" : "hover:bg-white/10"}`}>
-                    <div className="h-8 w-8 rounded-full grid place-items-center shrink-0"
-                      style={{ background: `color-mix(in oklab, ${item.color} 22%, transparent)`, color: item.color }}>
-                      <Icon className="h-4 w-4"/>
-                    </div>
-                    <span className="text-xs font-bold" style={{ color: item.color }}>{item.label}</span>
-                  </Link>
-                );
-              })}
+        <div ref={panelRef} className="fixed inset-x-0 top-14 z-[30] px-3 pt-2 pb-3 animate-pop-in">
+          <div className="mx-auto max-w-6xl">
+            <div className="glass-strong rounded-2xl p-3 shadow-xl border border-white/10">
+              <p className="text-[11px] font-bold text-muted-foreground px-1 pb-2 border-b border-white/10 mb-2 flex items-center gap-1.5">
+                <LayoutGrid className="h-3 w-3" /> تصفّح الأقسام
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {NAV.map((item) => {
+                  const Icon = item.icon;
+                  const active = current === item.to;
+                  return (
+                    <Link key={item.to} to={item.to} onClick={() => setOpen(false)}
+                      style={{ borderColor: active ? item.color : undefined }}
+                      className={`flex items-center gap-2 p-3 rounded-2xl text-right transition border border-transparent ${
+                        active ? "bg-white/10" : "hover:bg-white/10"
+                      }`}>
+                      <div className="h-8 w-8 rounded-full grid place-items-center shrink-0"
+                        style={{ background: `color-mix(in oklab, ${item.color} 22%, transparent)`, color: item.color }}>
+                        <Icon className="h-4 w-4"/>
+                      </div>
+                      <span className="text-xs font-bold" style={{ color: item.color }}>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -206,6 +218,8 @@ function setLang(code: string) {
 function TranslateButton() {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("ar");
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setCurrent(getCurrentLang());
     // Restore last chosen language from localStorage if cookie was wiped
@@ -265,48 +279,54 @@ function TranslateButton() {
     }
   }, []);
 
-  // Close on Escape
+  // Close on Escape and outside click
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (!btnRef.current?.contains(t) && !panelRef.current?.contains(t)) setOpen(false);
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onDown);
+    };
   }, [open]);
 
   return (
     <>
-      <button onClick={() => setOpen(true)} title="ترجمة الموقع"
-        className="liquid-glass inline-flex items-center justify-center h-9 w-9 rounded-full">
+      <button ref={btnRef} onClick={() => setOpen(v => !v)} title="ترجمة الموقع"
+        className={`liquid-glass inline-flex items-center justify-center h-8 sm:h-9 w-8 sm:w-9 rounded-full transition ${
+          open ? "ring-2 ring-primary/40 bg-primary/10" : ""
+        }`}>
         <Globe className="h-3.5 w-3.5" />
       </button>
       {open && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xl animate-pop-in"
-             onClick={() => setOpen(false)}>
-          <div onClick={e => e.stopPropagation()}
-            className="w-full max-w-xs glass-strong rounded-3xl p-3 shadow-2xl border border-white/10">
-            <div className="flex items-center justify-between px-2 py-2 border-b border-white/10 mb-2">
-              <div className="flex items-center gap-2 text-xs font-bold">
-                <Globe className="h-3.5 w-3.5"/> اختر لغة الترجمة
-              </div>
-              <button onClick={() => setOpen(false)} className="p-1 rounded-md hover:bg-white/10">
-                <X className="h-3.5 w-3.5"/>
-              </button>
+        <div ref={panelRef} className="fixed inset-x-0 top-14 z-[30] px-3 pt-2 pb-3 animate-pop-in">
+          <div className="mx-auto max-w-6xl">
+            <div className="glass-strong rounded-2xl p-3 shadow-xl border border-white/10">
+              <p className="text-[11px] font-bold text-muted-foreground px-1 pb-2 border-b border-white/10 mb-2 flex items-center gap-1.5">
+                <Globe className="h-3 w-3" /> اختر لغة الترجمة
+              </p>
+              <ul className="max-h-[52vh] overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1 scrollbar-thin">
+                {LANGS.map(l => (
+                  <li key={l.code}>
+                    <button onClick={() => setLang(l.code)}
+                      className={`w-full flex items-center justify-between gap-2 text-right px-3 py-2 rounded-xl text-sm transition ${
+                        l.code === current ? "bg-primary/20 text-primary font-bold" : "hover:bg-white/10"
+                      }`}>
+                      <span className="flex flex-col items-start">
+                        <span>{l.native}</span>
+                        <span className="text-[10px] text-muted-foreground">{l.label}</span>
+                      </span>
+                      {l.code === current && <Check className="h-3.5 w-3.5"/>}
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="max-h-[60vh] overflow-y-auto flex flex-col gap-0.5 scrollbar-thin">
-              {LANGS.map(l => (
-                <li key={l.code}>
-                  <button onClick={() => setLang(l.code)}
-                    className={`w-full flex items-center justify-between gap-2 text-right px-3 py-2.5 rounded-xl text-sm transition ${
-                      l.code === current ? "bg-primary/20 text-primary font-bold" : "hover:bg-white/10"}`}>
-                    <span className="flex flex-col items-start">
-                      <span>{l.native}</span>
-                      <span className="text-[10px] text-muted-foreground">{l.label}</span>
-                    </span>
-                    {l.code === current && <Check className="h-3.5 w-3.5"/>}
-                  </button>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       )}

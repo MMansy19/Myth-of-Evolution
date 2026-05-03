@@ -315,7 +315,7 @@ function InsertBar({ editor }: { editor: Editor }) {
   };
 
   return (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 p-2 border-b border-white/10 bg-background/85 backdrop-blur-xl rounded-t-xl">
+    <div className="sticky top-16 z-[25] flex flex-wrap items-center gap-0.5 p-2 border-b border-white/10 bg-background/95 backdrop-blur-xl rounded-t-xl">
       <Btn title="عنوان كبير" active={editor.isActive("heading", { level: 1 })} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}><Heading1 className="h-3.5 w-3.5"/></Btn>
       <Btn title="عنوان متوسط" active={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}><Heading2 className="h-3.5 w-3.5"/></Btn>
       <Btn title="عنوان صغير" active={editor.isActive("heading", { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}><Heading3 className="h-3.5 w-3.5"/></Btn>

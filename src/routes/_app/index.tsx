@@ -115,7 +115,7 @@ function Home() {
             ◈ تحليل علمي ◈ نقد منهجي ◈ حقيقة موثقة ◈
           </p>
           <h1
-            className="text-5xl sm:text-6xl font-black leading-tight"
+            className="text-3xl sm:text-5xl font-black leading-tight"
             style={{
               color: "oklch(0.62 0.19 152)",
               textShadow: "0 0 22px oklch(0.62 0.19 152 / 0.55), 0 0 8px oklch(0.62 0.19 152 / 0.4)",
@@ -264,7 +264,7 @@ function Home() {
                   <h3 className="font-bold text-base mb-1.5">{p.title}</h3>
                 </Link>
                 <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
-                  {p.content.slice(0, 200)}...
+                  {p.content.replace(/<[^>]+>/g, "").slice(0, 200)}...
                 </p>
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10 text-[11px]">
                   <span className="text-muted-foreground">
