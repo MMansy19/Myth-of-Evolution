@@ -1,0 +1,9 @@
+---
+name: Visual direction
+description: Liquid glass dark interface with richer teal, gold, violet accents and clearer inputs
+type: design
+---
+اعتمد واجهة داكنة بتأثير liquid glass واضح ومريح للعين.
+الألوان الأساسية يجب أن تكون أغنى وأكثر جاذبية من النسخة السابقة، مع توازن بين teal وviolet وgold accents.
+الحقول والأزرار يجب أن تكون أوضح بصرياً مع حدود وتباين أفضل.
+يجب إخفاء خيار "النشر كضيف" عن المشرفين واستبداله بعبارة "إضافة منشور" أو توجيههم للنشر المباشر.

@@ -1,0 +1,19 @@
+project_id = "zwindietzovcleiatfbr"
+
+[functions.evolution-critic]
+verify_jwt = false
+
+[functions.verify-critique]
+verify_jwt = false
+
+[functions.ai-search]
+verify_jwt = false
+
+[functions.guest-post-review]
+verify_jwt = false
+
+[functions.post-chat]
+verify_jwt = false
+
+[functions.smart-title]
+verify_jwt = false
