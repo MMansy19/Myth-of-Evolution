@@ -9,6 +9,38 @@ import { PostAIButton } from "@/components/PostAIChat";
 import { RelatedPosts } from "@/components/RelatedPosts";
 
 export const Route = createFileRoute("/_app/post/$id")({
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("posts")
+      .select("id, title, content, cover_image_url, category")
+      .eq("id", params.id)
+      .maybeSingle();
+    return data ?? null;
+  },
+  head: ({ loaderData: post }) => {
+    if (!post) return { meta: [{ title: "المنشور · وهم التطور" }] };
+    const desc = (post.content as string | null)
+      ?.replace(/<[^>]+>/g, "")
+      .slice(0, 160)
+      .trim() ?? "";
+    const title = `${post.title} · وهم التطور`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: post.title as string },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "article" },
+        ...(post.cover_image_url
+          ? [
+              { property: "og:image", content: post.cover_image_url as string },
+              { name: "twitter:image", content: post.cover_image_url as string },
+              { name: "twitter:card", content: "summary_large_image" },
+            ]
+          : []),
+      ],
+    };
+  },
   component: PostPage,
 });
 
