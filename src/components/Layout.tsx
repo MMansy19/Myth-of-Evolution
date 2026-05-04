@@ -22,6 +22,7 @@ export default function Layout() {
   // Reading-focused pages should maximize horizontal space
   const isReadingFocus = path.startsWith("/post/") || path === "/critic";
 
+  const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">(() => (typeof window !== "undefined" && localStorage.getItem("theme") === "light") ? "light" : "dark");
   useEffect(() => {
     document.documentElement.classList.toggle("light", theme === "light");
@@ -40,20 +41,23 @@ export default function Layout() {
 
   return (
     <div className="ambient-orbs relative min-h-screen">
+      {menuOpen && (
+        <div className="fixed inset-0 z-[19] backdrop-blur-sm bg-black/30 pointer-events-none transition-all duration-200" />
+      )}
       <header className="site-header sticky top-0 z-20">
         <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
           <Link to="/" className="flex items-center gap-2 group">
-            <img src={logo} alt="وهم التطور" className="h-10 w-auto object-contain drop-shadow-[0_0_12px_rgba(250,200,80,0.45)]" />
+            <img src={logo} alt="وهم التطور" className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(250,200,80,0.45)]" />
           </Link>
 
           <div className="flex items-center gap-2">
-            {showNav && <SectionsButton current={path}/>}
+            {showNav && <SectionsButton current={path} onOpenChange={setMenuOpen}/>}
             <button onClick={toggleTheme}
               title={theme === "dark" ? "وضع نهاري" : "وضع ليلي"}
               className="liquid-glass inline-flex items-center justify-center h-9 w-9 rounded-full">
               {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
             </button>
-            <TranslateButton />
+            <TranslateButton onOpenChange={setMenuOpen}/>
             {isStaff && (
               <Link to="/admin" title={isOwner ? "لوحة المالك" : "لوحة المشرف"}
                 className="liquid-glass inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold">
@@ -88,10 +92,14 @@ export default function Layout() {
 }
 
 /** Button that opens an inline dropdown panel below the sticky header. */
-function SectionsButton({ current }: { current: string }) {
+function SectionsButton({ current, onOpenChange }: { current: string; onOpenChange: (open: boolean) => void }) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    onOpenChange(open);
+  }, [open, onOpenChange]);
 
   useEffect(() => {
     if (!open) return;
@@ -215,7 +223,7 @@ function setLang(code: string) {
   setTimeout(() => window.location.reload(), 700);
 }
 
-function TranslateButton() {
+function TranslateButton({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("ar");
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -278,6 +286,9 @@ function TranslateButton() {
       document.body.appendChild(s);
     }
   }, []);
+
+  // Sync open state to parent
+  useEffect(() => { onOpenChange(open); }, [open, onOpenChange]);
 
   // Close on Escape and outside click
   useEffect(() => {
